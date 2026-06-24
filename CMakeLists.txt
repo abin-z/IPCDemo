@@ -56,3 +56,4 @@ FetchContent_MakeAvailable(fmt)
 link_libraries(fmt::fmt)
 
 add_subdirectory(helloworld)
+add_subdirectory(shm)
