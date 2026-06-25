@@ -109,7 +109,7 @@ int main()
 
   // strcpy 会复制字符串内容，
   // 并自动复制结尾 '\0'
-  std::strcpy(sharedData->message, "Hello Shared Memory");
+  std::strcpy(sharedData->message, "Hello Shared Memory + Semaphore");
 
   fmt::print("Writer:\n");
   fmt::print("value   = {}\n", sharedData->value);

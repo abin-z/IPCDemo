@@ -25,7 +25,7 @@ int main()
   // 返回值：
   // 成功 -> 文件描述符(fd)
   // 失败 -> -1
-  int fd = shm_open(SHM_NAME, O_RDWR, 0666);
+  int fd = shm_open(SHM_NAME, O_RDWR | O_CREAT, 0666);
   if (fd == -1)
   {
     fmt::print("Failed to open shared memory\n");
