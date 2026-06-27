@@ -121,6 +121,8 @@ int main()
   sem_post(sem);
 
   fmt::print("Notification sent\n");
+  // 关闭 semaphore（关键）
+  sem_close(sem);
 
   // 解除映射
   //
