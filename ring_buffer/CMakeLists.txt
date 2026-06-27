@@ -1,0 +1,1 @@
+add_executable(ring_buffer ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
