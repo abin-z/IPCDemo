@@ -121,20 +121,26 @@ class RingBuffer
     return true;
   }
 
-  [[nodiscard]] bool empty() const
+  // 判断缓冲区当前是否为空。
+  //
+  // 注意：
+  // 返回值仅表示调用时刻的状态快照（Snapshot）。
+  // 在并发环境下，返回后缓冲区状态可能立即发生变化，这基本可以说是 Lock-Free 数据结构的共性。
+  // 因此不应依赖 empty() 的结果作为后续 push()/pop() 的同步条件。
+  [[nodiscard]] bool empty() const noexcept
   {
-    return read_.load() == write_.load();
+    return read_.load(std::memory_order_relaxed) == write_.load(std::memory_order_relaxed);
   }
 
-  [[nodiscard]] bool full() const
+  [[nodiscard]] bool full() const noexcept
   {
-    return (write_.load() + 1) % Capacity == read_.load();
+    return (write_.load(std::memory_order_relaxed) + 1) % Capacity == read_.load(std::memory_order_relaxed);
   }
 
-  [[nodiscard]] std::size_t size() const
+  [[nodiscard]] std::size_t size() const noexcept
   {
-    const auto write = write_.load();
-    const auto read = read_.load();
+    const auto write = write_.load(std::memory_order_relaxed);
+    const auto read = read_.load(std::memory_order_relaxed);
 
     return (write + Capacity - read) % Capacity;
   }
@@ -143,9 +149,9 @@ class RingBuffer
   // 环形缓冲区存储空间
   std::array<T, Capacity> buffer_{};
 
-  // 写索引（仅 Producer 修改）
-  std::atomic<std::size_t> write_{0};
+  // 写索引（仅 Producer 修改）, alignas(64) 保证 write_ 与 read_ 不在同一缓存行，避免伪共享
+  alignas(64) std::atomic<std::size_t> write_{0};
 
   // 读索引（仅 Consumer 修改）
-  std::atomic<std::size_t> read_{0};
+  alignas(64) std::atomic<std::size_t> read_{0};
 };
